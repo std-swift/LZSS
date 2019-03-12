@@ -61,7 +61,7 @@ final class LZSSTests: XCTestCase {
 		"""#
 		
 		var encoder = LZSSEncoder()
-		encoder.encodePartial(source.utf8)
+		encoder.encode(source.utf8)
 		let compressed = encoder.finalize()
 		XCTAssertEqual(compressed.count, 106) // Compression amount check
 		
@@ -75,7 +75,7 @@ final class LZSSTests: XCTestCase {
 	func testPartialEncoding() {
 		let source = "I am SamSam I amThat Sam-I-am!That Sam-I-am!I do not like"
 		var encoder = LZSSEncoder()
-		encoder.encodePartial(source.utf8)
+		encoder.encode(source.utf8)
 		let output = encoder.finalize()
 		XCTAssertLessThan(output.count, source.count)
 		
@@ -88,7 +88,7 @@ final class LZSSTests: XCTestCase {
 		}
 		var encoder2 = LZSSEncoder()
 		let partialOutputs = partialSources
-			.map { encoder2.encode($0.utf8) } + [encoder2.finalize()]
+			.map { encoder2.encodePartial($0.utf8) } + [encoder2.finalize()]
 		let finalOutput = partialOutputs.reduce([], +)
 		XCTAssertEqual(finalOutput, output)
 	}
@@ -96,14 +96,14 @@ final class LZSSTests: XCTestCase {
 	func testPartialDecoding() {
 		let source = "I am SamSam I amThat Sam-I-am!That Sam-I-am!I do not like"
 		var encoder = LZSSEncoder()
-		encoder.encodePartial(source.utf8)
+		encoder.encode(source.utf8)
 		let output = encoder.finalize()
 		XCTAssertLessThan(output.count, source.count)
 		
 		let partialOutputs = stride(from: 0, to: output.count, by: 5)
 			.map { Array(output[$0..<min($0 + 5, output.count)]) }
 		var decoder = LZSSDecoder()
-		let partialSources = partialOutputs.map { decoder.decode($0) }
+		let partialSources = partialOutputs.map { decoder.decodePartial($0) }
 		
 		let outputSource = partialSources.reduce([], +)
 			.map { Character(UnicodeScalar($0)) }
@@ -120,15 +120,15 @@ final class LZSSTests: XCTestCase {
 		for _ in 0..<100 {
 			inputLength += 100
 			let input = String(repeating: "A", count: 100)
-			let encoded = encoder.encode(input.utf8)
-			let decoded = decoder.decode(encoded)
+			let encoded = encoder.encodePartial(input.utf8)
+			let decoded = decoder.decodePartial(encoded)
 			let output = String(decoded.map { Character(UnicodeScalar($0)) })
 			outputLength += output.count
 			XCTAssert(output.allSatisfy { $0 == "A" })
 		}
 		
 		let encoded = encoder.finalize()
-		let decoded = decoder.decode(encoded)
+		let decoded = decoder.decodePartial(encoded)
 		let output = String(decoded.map { Character(UnicodeScalar($0)) })
 		outputLength += output.count
 		XCTAssert(output.allSatisfy { $0 == "A" })
@@ -142,7 +142,7 @@ final class LZSSTests: XCTestCase {
 			
 			for _ in 0..<100 {
 				let input = String(repeating: "A", count: 10000)
-				_ = encoder.encode(input.utf8)
+				_ = encoder.encodePartial(input.utf8)
 			}
 		}
 	}
@@ -154,8 +154,8 @@ final class LZSSTests: XCTestCase {
 			
 			for _ in 0..<100 {
 				let input = String(repeating: "A", count: 10000)
-				let encoded = encoder.encode(input.utf8)
-				_ = decoder.decode(encoded)
+				let encoded = encoder.encodePartial(input.utf8)
+				_ = decoder.decodePartial(encoded)
 			}
 		}
 	}

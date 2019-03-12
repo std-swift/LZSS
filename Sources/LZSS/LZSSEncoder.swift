@@ -3,7 +3,13 @@
 //  LZSS
 //
 
-public struct LZSSEncoder {
+import Encoding
+
+public struct LZSSEncoder: StreamEncoder {
+	public typealias Element = UInt8
+	public typealias Partial = [Element]
+	public typealias Encoded = [Element]
+	
 	private var inputQueue = [UInt8]()
 	private var outputQueue = [UInt8]()
 	
@@ -27,23 +33,18 @@ public struct LZSSEncoder {
 	
 	public init() {}
 	
-	/// Add `data` to the decoding queue and decode as much as possible to the
-	/// output queue
-	public mutating func encodePartial<T: Sequence>(_ data: T) where T.Element == UInt8 {
-		self.inputQueue.append(contentsOf: data)
+	public mutating func encode<T: Sequence>(_ elements: T) where T.Element == Element {
+		self.inputQueue.append(contentsOf: elements)
 		self.encodeStep(final: false)
 	}
 	
-	/// Add `data` to the decoding queue and return everything that can be
-	/// decoded
-	public mutating func encode<T: Sequence>(_ data: T) -> [UInt8] where T.Element == UInt8 {
-		self.inputQueue.append(contentsOf: data)
+	public mutating func encodePartial<T: Sequence>(_ elements: T) -> [LZSSEncoder.Element] where T.Element == Element {
+		self.inputQueue.append(contentsOf: elements)
 		self.encodeStep(final: false)
 		defer { self.outputQueue.removeAll(keepingCapacity: true) }
 		return self.outputQueue
 	}
 	
-	/// Stop buffering input data and encode the remaining buffer
 	public mutating func finalize() -> [UInt8] {
 		self.encodeStep(final: true)
 		defer { self.outputQueue.removeAll(keepingCapacity: true) }

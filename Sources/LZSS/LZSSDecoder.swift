@@ -3,8 +3,13 @@
 //  LZSS
 //
 
-/// A queue decoder. Data is stored in input and output queues.
-public struct LZSSDecoder {
+import Encoding
+
+public struct LZSSDecoder: StreamDecoder {
+	public typealias Element = UInt8
+	public typealias Partial = [Element]
+	public typealias Decoded = [Element]
+	
 	private var inputQueue = [UInt8]()
 	private var outputQueue = [UInt8]()
 	
@@ -13,26 +18,21 @@ public struct LZSSDecoder {
 	private var buffer = [UInt8](repeating: 32, count: LZSS.BufferSize) // Space
 	
 	public init() {}
-	
-	/// Add `data` to the decoding queue and decode as much as possible to the
-	/// output queue
-	public mutating func decodePartial<T: Sequence>(_ data: T) where T.Element == UInt8 {
-		self.inputQueue.append(contentsOf: data)
+
+	public mutating func decode<T: Sequence>(_ elements: T) where T.Element == Element {
+		self.inputQueue.append(contentsOf: elements)
 		self.decodeStep()
 	}
 	
-	/// Add `data` to the decoding queue and return everything that can be
-	/// decoded
-	public mutating func decode<T: Sequence>(_ data: T) -> [UInt8] where T.Element == UInt8 {
-		self.inputQueue.append(contentsOf: data)
+	public mutating func decodePartial<T: Sequence>(_ elements: T) -> Partial where T.Element == Element {
+		self.inputQueue.append(contentsOf: elements)
 		self.decodeStep()
-		defer { self.outputQueue = [] }
+		defer { self.outputQueue.removeAll(keepingCapacity: true) }
 		return self.outputQueue
 	}
 	
-	/// Stop buffering input data and encode the remaining buffer
-	public mutating func finalize() -> [UInt8] {
-		defer { self.outputQueue = [] }
+	public mutating func finalize() -> Decoded {
+		defer { self.outputQueue.removeAll(keepingCapacity: true) }
 		return self.outputQueue
 	}
 	
@@ -68,6 +68,6 @@ public struct LZSSDecoder {
 			
 			self.flags >>= 1
 		}
-		self.inputQueue = []
+		self.inputQueue.removeAll(keepingCapacity: true)
 	}
 }

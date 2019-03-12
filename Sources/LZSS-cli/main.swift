@@ -44,7 +44,7 @@ private func encode() {
 	var encoder = LZSSEncoder()
 	while true {
 		guard ReadInput() else { break }
-		output = encoder.encode(input)
+		output = encoder.encodePartial(input)
 		WriteOutput()
 	}
 	output = encoder.finalize()
@@ -55,7 +55,7 @@ private func decode() {
 	var decoder = LZSSDecoder()
 	while true {
 		guard ReadInput() else { break }
-		output = decoder.decode(input)
+		output = decoder.decodePartial(input)
 		WriteOutput()
 	}
 	output = decoder.finalize()

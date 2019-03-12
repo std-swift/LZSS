@@ -16,10 +16,14 @@ let package = Package(
 			name: "lzss",
 			targets: ["LZSS-cli"]),
 	],
+	dependencies: [
+		.package(url: "https://github.com/std-swift/Encoding.git",
+		         from: "1.1.0")
+	],
 	targets: [
 		.target(
 			name: "LZSS",
-			dependencies: []),
+			dependencies: ["Encoding"]),
 		.testTarget(
 			name: "LZSSTests",
 			dependencies: ["LZSS"]),

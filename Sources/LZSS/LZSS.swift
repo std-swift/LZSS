@@ -10,15 +10,17 @@ public struct LZSS {
 	internal static let NIL = BufferSize
 	internal static let BufferIndexMask = 4096 - 1
 	
-	public static func decode<T: Sequence>(_ data: T) -> [UInt8] where T.Element == UInt8 {
+	@inlinable
+	public static func decode<T: Sequence>(_ data: T) -> LZSSDecoder.Decoded where T.Element == LZSSDecoder.Element {
 		var decoder = LZSSDecoder()
-		decoder.decodePartial(data)
+		decoder.decode(data)
 		return decoder.finalize()
 	}
 	
-	public static func encode<T: Sequence>(_ data: T) -> [UInt8] where T.Element == UInt8 {
+	@inlinable
+	public static func encode<T: Sequence>(_ data: T) -> LZSSEncoder.Encoded where T.Element == LZSSEncoder.Element {
 		var decoder = LZSSEncoder()
-		decoder.encodePartial(data)
+		decoder.encode(data)
 		return decoder.finalize()
 	}
 }

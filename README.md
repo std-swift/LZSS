@@ -22,7 +22,7 @@ import LZSS
 ```Swift
 dependencies: [
 	.package(url: "https://github.com/std-swift/LZSS.git",
-	         from: "1.0.0")
+	         from: "2.0.0")
 ],
 targets: [
 	.target(
@@ -35,25 +35,12 @@ targets: [
 
 ## Using
 
+- `LZSSDecoder: StreamDecoder` with `UInt8` elements
+- `LZSSEncoder: StreamEncoder` with `UInt8` elements
+
 ### `LZSS`
 
 ```Swift
-LZSS.decode(_ data: Sequence) -> [UInt8]
-LZSS.encode(_ data: Sequence) -> [UInt8]
-```
-
-### `LZSSDecoder`
-
-```Swift
-mutating func decodePartial<T: Sequence>(_ data: T) where T.Element == UInt8
-mutating func decode<T: Sequence>(_ data: T) -> [UInt8] where T.Element == UInt8
-mutating func finalize() -> [UInt8]
-```
-
-### `LZSSEncoder`
-
-```Swift
-mutating func encodePartial<T: Sequence>(_ data: T) where T.Element == UInt8
-mutating func encode<T: Sequence>(_ data: T) -> [UInt8] where T.Element == UInt8
-mutating func finalize() -> [UInt8]
+LZSS.decode(_ data: Sequence) -> LZSSDecoder.Decoded
+LZSS.encode(_ data: Sequence) -> LZSSEncoder.Encoded
 ```
