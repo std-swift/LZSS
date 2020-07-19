@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.1
 //
 //  Package.swift
 //  LZSS
@@ -17,13 +17,14 @@ let package = Package(
 			targets: ["LZSS-cli"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/std-swift/Encoding.git",
-		         from: "1.1.0")
+		.package(url: "https://github.com/std-swift/Encoding.git", from: "2.0.0")
 	],
 	targets: [
 		.target(
 			name: "LZSS",
-			dependencies: ["Encoding"]),
+			dependencies: [
+				.product(name: "Encoding", package: "Encoding"),
+			]),
 		.testTarget(
 			name: "LZSSTests",
 			dependencies: ["LZSS"]),

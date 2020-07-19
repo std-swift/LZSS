@@ -137,26 +137,25 @@ final class LZSSTests: XCTestCase {
 	}
 	
 	func testEncodePerformance() {
+		let input = String(repeating: "A", count: 100_000)
+		
 		measure {
 			var encoder = LZSSEncoder()
-			
-			for _ in 0..<100 {
-				let input = String(repeating: "A", count: 10000)
-				_ = encoder.encodePartial(input.utf8)
-			}
+			encoder.encode(input.utf8)
+			_ = encoder.finalize()
 		}
 	}
 	
 	func testDecodePerformance() {
+		let input = String(repeating: "A", count: 100_000)
+		var encoder = LZSSEncoder()
+		encoder.encode(input.utf8)
+		let encoded = encoder.finalize()
+		
 		measure {
-			var encoder = LZSSEncoder()
 			var decoder = LZSSDecoder()
-			
-			for _ in 0..<100 {
-				let input = String(repeating: "A", count: 10000)
-				let encoded = encoder.encodePartial(input.utf8)
-				_ = decoder.decodePartial(encoded)
-			}
+			decoder.decode(encoded)
+			_ = decoder.finalize()
 		}
 	}
 }

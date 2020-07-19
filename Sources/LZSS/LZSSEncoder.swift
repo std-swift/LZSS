@@ -15,15 +15,46 @@ public struct LZSSEncoder: StreamEncoder {
 	
 	private var index = 0
 	private var bufferIndex = LZSS.BufferSize - LZSS.MaxLength
-	private var codeBuffer = [0] + [UInt8](repeating: 32, count: 16) // Space
-	private var buffer = [UInt8](repeating: 32, count: LZSS.BufferSize + LZSS.MaxLength - 1) // Space
+	private var codeBuffer: UnsafeMutableBufferPointer<UInt8> = {
+		let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: 17)
+		buffer[0] = 0
+		for i in 1..<buffer.count {
+			buffer[i] = 32 // Space
+		}
+		return buffer
+	}()
+	private var buffer: UnsafeMutableBufferPointer<UInt8> = {
+		let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: LZSS.BufferSize + LZSS.MaxLength - 1)
+		for i in 0..<buffer.count {
+			buffer[i] = 32 // Space
+		}
+		return buffer
+	}()
 	
 	private var match_length = 0
 	private var match_position = 0
 	
-	private var treeParent = [Int](repeating: LZSS.NIL, count: LZSS.BufferSize + 1)
-	private var treeLeft   = [Int](repeating: LZSS.NIL, count: LZSS.BufferSize + 1)
-	private var treeRight  = [Int](repeating: LZSS.NIL, count: LZSS.BufferSize + 257)
+	private var treeParent: UnsafeMutableBufferPointer<Int> = {
+		let buffer = UnsafeMutableBufferPointer<Int>.allocate(capacity: LZSS.BufferSize + 1)
+		for i in 0..<buffer.count {
+			buffer[i] = LZSS.NIL
+		}
+		return buffer
+	}()
+	private var treeLeft: UnsafeMutableBufferPointer<Int> = {
+		let buffer = UnsafeMutableBufferPointer<Int>.allocate(capacity: LZSS.BufferSize + 1)
+		for i in 0..<buffer.count {
+			buffer[i] = LZSS.NIL
+		}
+		return buffer
+	}()
+	private var treeRight: UnsafeMutableBufferPointer<Int> = {
+		let buffer = UnsafeMutableBufferPointer<Int>.allocate(capacity: LZSS.BufferSize + 257)
+		for i in 0..<buffer.count {
+			buffer[i] = LZSS.NIL
+		}
+		return buffer
+	}()
 	
 	private var length = 0
 	private var lastMatchLength = 0

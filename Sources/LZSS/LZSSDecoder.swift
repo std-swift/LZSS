@@ -15,7 +15,13 @@ public struct LZSSDecoder: StreamDecoder {
 	
 	private var flags = 0
 	private var bufferIndex = LZSS.BufferSize - LZSS.MaxLength
-	private var buffer = [UInt8](repeating: 32, count: LZSS.BufferSize) // Space
+	private var buffer: UnsafeMutableBufferPointer<UInt8> = {
+		let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: LZSS.BufferSize + LZSS.MaxLength - 1)
+		for i in 0..<buffer.count {
+			buffer[i] = 32 // Space
+		}
+		return buffer
+	}()
 	
 	public init() {}
 

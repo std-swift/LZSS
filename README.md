@@ -1,6 +1,6 @@
 # LZSS
 
-[![](https://img.shields.io/badge/Swift-5.0-orange.svg)][1]
+[![](https://img.shields.io/badge/Swift-5.1--5.3-orange.svg)][1]
 [![](https://img.shields.io/badge/os-macOS%20|%20Linux-lightgray.svg)][1]
 [![](https://travis-ci.com/std-swift/LZSS.svg?branch=master)][2]
 [![](https://codecov.io/gh/std-swift/LZSS/branch/master/graph/badge.svg)][3]
@@ -15,32 +15,20 @@ LZSS compression
 
 ## Importing
 
+Add the following line to the dependencies in your `Package.swift` file:
+
+```Swift
+.package(url: "https://github.com/std-swift/LZSS.git", from: "3.0.0")
+```
+
+Add `Encoding` as a dependency for your target:
+
+```swift
+.product(name: "LZSS", package: "LZSS"),
+```
+
+and finally,
+
 ```Swift
 import LZSS
-```
-
-```Swift
-dependencies: [
-	.package(url: "https://github.com/std-swift/LZSS.git",
-	         from: "2.0.0")
-],
-targets: [
-	.target(
-		name: "",
-		dependencies: [
-			"LZSS"
-		]),
-]
-```
-
-## Using
-
-- `LZSSDecoder: StreamDecoder` with `UInt8` elements
-- `LZSSEncoder: StreamEncoder` with `UInt8` elements
-
-### `LZSS`
-
-```Swift
-LZSS.decode(_ data: Sequence) -> LZSSDecoder.Decoded
-LZSS.encode(_ data: Sequence) -> LZSSEncoder.Encoded
 ```
